@@ -315,7 +315,7 @@ function hideNull(){
  */
 
 async function display(){
-    console.log(document.location);
+    console.log(document.location - document.location.origin);
     var response = await fetch("https://magog-products.firebaseio.com/.json");
     window.dataBase = await response.json();
     var main = "";
