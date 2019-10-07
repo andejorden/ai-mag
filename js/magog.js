@@ -315,7 +315,7 @@ function hideNull(){
  */
 
 async function display(){
-    console.log(document.location - document.location.origin);
+    console.log(document.location.pathname);
     var response = await fetch("https://magog-products.firebaseio.com/.json");
     window.dataBase = await response.json();
     var main = "";
@@ -341,7 +341,7 @@ async function display(){
 /**
  * Randeaza pagina de HOME
  */
-    if(document.location.pathname === homePage || document.location.pathname === "/"){
+    if(document.location.pathname === homePage || document.location.pathname === "/ai-mag/"){
         document.querySelector("header").insertAdjacentHTML("afterend", `<hr>${bootstrapSlideShow}<hr>`);
         drawProductList();
 /**
