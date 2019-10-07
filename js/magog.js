@@ -1,6 +1,6 @@
 var indexProdus = -1;
 var dataBase = [];
-var homePage = "/index.html";
+var homePage = "/ai-mag/index.html";
 var productPage = "/product-page.html";
 var cartPage = "/cart.html";
 var adminPage = "/admin.html";
