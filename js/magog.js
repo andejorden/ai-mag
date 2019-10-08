@@ -1,19 +1,5 @@
 var dataBase = [];
-var homePage = "/ai-mag/index.html";
-var productPage = "/ai-mag/product-page.html";
-var cartPage = "/ai-mag/cart.html";
-var adminPage = "/ai-mag/admin.html";
 var size = 0;
-var header = `<hgroup>
-    <h1 class="text-success"><a href="index.html" class="card-link"><i class="fas fa-eye"></i> <strong>AI-Mag</strong></a> - <small>My First Online Virtual Shop</small></h1>
-    <h2 class="text-info">The Final Project</h2>
-    <h3>HTML5, Bootstrap & Javascript</h3>
-</hgroup>`;
-var footer = `<footer class="jumbotron text-center rounded">
-    <div>
-        <p><i class="fas fa-copyright"></i> <strong>AI Copyright</strong> - All rights reserved!</p>
-    </div>
-</footer>`;
 
 class Produs{
     constructor(id, name, price, count){
@@ -28,12 +14,12 @@ class Produs{
  * functia Remove Item
  */
 
- async function removeProductsItem(i){
+async function removeProductsItem(i){
     if(confirm(`Sigur vrei sa stergi din lista produsul ${dataBase.produse[i].name}`)){
         response = await fetch(`https://magog-products.firebaseio.com/produse/${i}.json`, {method:"delete"});
         document.querySelector("div.alert").classList.remove("d-none");
         document.querySelector("div.alert").innerHTML = `<strong>${dataBase.produse[i].name}</strong> a fost sters din lista!`;
-        setTimeout(function(){ display(); }, 3000);
+        setTimeout(function(){ display(); }, 2000);
     }
  }
 
@@ -58,15 +44,22 @@ class Produs{
        price: document.querySelector("[name='Pret']").value,
        stoc: document.querySelector("[name='Stoc']").value
     };
+    if(obj.description === "" || obj.image === "" || obj.name === "" || obj.stoc === ""){
+       document.querySelector("div.alert").classList.add("alert-danger");
+       document.querySelector("div.alert").classList.remove("d-none");
+       document.querySelector("div.alert").innerHTML = `<strong>Completeaza toate datele necesare!!!</strong>`;
+        return;
+    }else{
     response = await fetch(`https://magog-products.firebaseio.com/produse/.json`, {method:"post", body:JSON.stringify(obj)});
     document.querySelector("div.alert").classList.remove("d-none");
     document.querySelector("div.alert").innerHTML = `<strong>SUCCES</strong> produsul a fost adaugat in lista!`;
     form.reset();
-    setTimeout(function(){ display(); }, 3000);
+    setTimeout(function(){ display(); }, 2000);
+    }
   }
 
  /**
-  * functia care aduce produce noi in lista
+  * functia care aduce produse noi in lista
   */
 
  function addNewProductForm(){
@@ -90,11 +83,18 @@ class Produs{
          stoc: document.querySelector("[name='Stoc']").value
 
      };
-     response = await fetch(`https://magog-products.firebaseio.com/produse/${i}.json`, {method:"put", body:JSON.stringify(obj)});
-     document.querySelector("div.alert").classList.remove("d-none");
-     document.querySelector("div.alert").innerHTML = `<strong>Produsul</strong> a fost modificat cu succes!`;
-     form.reset();
-     setTimeout(function(){ adminFormReset(); }, 3000);
+     if(obj.description === "" || obj.image === "" || obj.name === "" || obj.stoc === ""){
+        document.querySelector("div.alert").classList.add("alert-danger");
+        document.querySelector("div.alert").classList.remove("d-none");
+        document.querySelector("div.alert").innerHTML = `<strong>Produsul nu poate fi modificat!</strong> Completeaza toate datele necesare!!!`;
+         return;
+     }else{
+        response = await fetch(`https://magog-products.firebaseio.com/produse/${i}.json`, {method:"put", body:JSON.stringify(obj)});
+        document.querySelector("div.alert").classList.remove("d-none");
+        document.querySelector("div.alert").innerHTML = `<strong>Produsul</strong> a fost modificat cu succes!`;
+        form.reset();
+        setTimeout(function(){ adminFormReset(); }, 2000);
+     }
  }
 
 /**
@@ -194,6 +194,7 @@ function drawCart(){
     var info = "";
     for(var i in dataBase.cart){
         var item = dataBase.cart[i].id;
+        console.log(dataBase.cart);
         subtotal = (dataBase.cart[i].price * dataBase.cart[i].count).toFixed(2);
         total += Number(subtotal);
         str += `<tr>
@@ -228,15 +229,19 @@ async function orderList(){
         var j = dataBase.cart[i].id;
         var restStoc = dataBase.produse[j].stoc - dataBase.cart[i].count;
         if(size === 0){
+            console.log(restStoc);
             return;
         }else{
             response = await fetch(`https://magog-products.firebaseio.com/produse/${j}/stoc/.json`,{method:"put", body:JSON.stringify(restStoc)});
             response = await fetch(`https://magog-products.firebaseio.com/cart/${i}/.json`,{method:"delete"});
+            document.querySelector("div.alert").classList.remove("d-none");
+            document.querySelector("div.alert").innerHTML = `<strong>Comanda</strong> a fost trimisa cu succes!`;
+            setTimeout(function(){ display(); }, 2000);
+        }
+        if(restStoc === 0){
+            response = await fetch(`https://magog-products.firebaseio.com/produse/${j}/.json`,{method:"delete"});
         }
     }
-    document.querySelector("div.alert").classList.remove("d-none");
-    document.querySelector("div.alert").innerHTML = `<strong>Comanda</strong> a fost trimisa cu succes!`;
-    setTimeout(function(){ display(); }, 3000);
 }
 
 function valoareTVA(pere){
@@ -284,7 +289,7 @@ async function addToCart(i, event){
             response = await fetch(`https://magog-products.firebaseio.com/cart/${item}/count/.json`,{method:"put", body:JSON.stringify(quantityNumeric)});
             document.querySelector("div.alert").classList.remove("d-none");
             document.querySelector("div.alert").innerHTML = `<strong>${dataBase.produse[i].name}</strong> a fost adaugat in cos!`;
-            setTimeout(function(){ display(); }, 3000);
+            setTimeout(function(){ display(); }, 2000);
             return;
         }
     }
@@ -292,7 +297,7 @@ async function addToCart(i, event){
     response = await fetch("https://magog-products.firebaseio.com/cart/.json",{method:"post", body:JSON.stringify(produs)});
     document.querySelector("div.alert").classList.remove("d-none");
     document.querySelector("div.alert").innerHTML = `<strong>${dataBase.produse[i].name}</strong> a fost adaugat in cos!`;
-    setTimeout(function(){ display(); }, 3000);
+    setTimeout(function(){ display(); }, 2000);
 }
 
 function cartItemsNumber(){
@@ -314,7 +319,7 @@ function hideNull(){
  */
 
 async function display(){
-    console.log(window.location);
+    console.log("draw...");
     var response = await fetch("https://magog-products.firebaseio.com/.json");
     window.dataBase = await response.json();
     var main = "";
@@ -340,7 +345,7 @@ async function display(){
 /**
  * Randeaza pagina de HOME
  */
-    if(document.location.pathname === homePage || document.location.pathname === "/ai-mag/"){
+    if(document.location.pathname === homePage || document.location.pathname === "/"){
         document.querySelector("header").insertAdjacentHTML("afterend", `<hr>${bootstrapSlideShow}<hr>`);
         drawProductList();
 /**
@@ -362,6 +367,7 @@ async function display(){
                 </nav>
             </header>
             <article class="container">
+                <hr>
                 <h2><strong>Shopping Cart</strong></h2>
                 <div id="cartTable" class="table-responsive">
                     <table class="table table-hover">
@@ -401,6 +407,7 @@ async function display(){
                 </nav>
             </header>
             <article>
+                <hr>
                 <h2><strong>Admin Page</strong><small class="text-success"> - Edit, Add/Remove</small></h2>
                     <div id="cartTable" class="table-responsive-sm">
                         <table class="table table-hover">
@@ -457,34 +464,3 @@ async function display(){
         drawAdminPage();
     }
 }
-
-var bootstrapSlideShow = `<div id="demo" class="carousel slide" data-ride="carousel">
-
-  <!-- Indicators -->
-  <ul class="carousel-indicators">
-    <li data-target="#demo" data-slide-to="0" class="active"></li>
-    <li data-target="#demo" data-slide-to="1"></li>
-    <li data-target="#demo" data-slide-to="2"></li>
-  </ul>
-  
-  <!-- The slideshow -->
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="/ai-mag/img/slide01.jpg" alt="Los Angeles" width="1100" height="500">
-    </div>
-    <div class="carousel-item">
-      <img src="/ai-mag/img/slide02.jpg" alt="Chicago" width="1100" height="500">
-    </div>
-    <div class="carousel-item">
-      <img src="/ai-mag/img/slide03.jpg" alt="New York" width="1100" height="500">
-    </div>
-  </div>
-  
-  <!-- Left and right controls -->
-  <a class="carousel-control-prev" href="#demo" data-slide="prev">
-    <span class="carousel-control-prev-icon"></span>
-  </a>
-  <a class="carousel-control-next" href="#demo" data-slide="next">
-    <span class="carousel-control-next-icon"></span>
-  </a>
-</div>`;
