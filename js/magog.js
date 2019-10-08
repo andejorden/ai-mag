@@ -119,7 +119,7 @@ function drawAdminPage(){
     var str = "";
     for( var i in dataBase.produse){
         str += `<tr>
-            <td><img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail"></td>
+            <td><img src="/ai-mag/${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail"></td>
             <td><h3><a href="#${i}" onclick="editItem('${i}', event)" title="Edit this Item">${dataBase.produse[i].name}</a></h3></td>
             <td><p>${dataBase.produse[i].description.substring(0, 100)}...</p></td>
             <td><p>${dataBase.produse[i].price} <i class="fas fa-dollar-sign"></i></p></td>
@@ -140,7 +140,7 @@ function drawProductDetails(){
         str = `<div class="container">
         <div class="row">
             <div class="col-lg-6 col-xl-7 pt-4 order-2 order-lg-1 photoswipe-gallery">
-                <img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
+                <img src="/ai-mag/${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
             </div>
             <div class="col-lg-6 col-xl-4 pt-4 order-1 order-lg-2 ml-lg-auto">
                 <h2><strong>${dataBase.produse[i].name}</strong></h2><hr>
@@ -171,7 +171,7 @@ function drawProductList(){
         str += `<div class="col-xl-2 col-lg-3 col-md-4 col-6">
         <div class="product">
             <div class="product-image">
-                <img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
+                <img src="/ai-mag/${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
             </div>
             <div class="info-box">
                 <h3 class="text-base mb-1"><a href="product-page.html?id=${i}" class="text-dark">${dataBase.produse[i].name}</a></h3>
