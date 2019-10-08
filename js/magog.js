@@ -1,9 +1,9 @@
 var indexProdus = -1;
 var dataBase = [];
-var homePage = "/ai-mag/index.html";
-var productPage = "/ai-mag/product-page.html";
-var cartPage = "/ai-mag/cart.html";
-var adminPage = "/ai-mag/admin.html";
+var homePage = "/index.html";
+var productPage = "/product-page.html";
+var cartPage = "/cart.html";
+var adminPage = "/admin.html";
 var size = 0;
 var header = `<hgroup>
     <h1 class="text-success"><a href="index.html" class="card-link"><i class="fas fa-eye"></i> <strong>AI-Mag</strong></a> - <small>My First Online Virtual Shop</small></h1>
@@ -120,7 +120,7 @@ function drawAdminPage(){
     var str = "";
     for( var i in dataBase.produse){
         str += `<tr>
-            <td><img src="/ai-mag/${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail"></td>
+            <td><img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail"></td>
             <td><h3><a href="#${i}" onclick="editItem('${i}', event)" title="Edit this Item">${dataBase.produse[i].name}</a></h3></td>
             <td><p>${dataBase.produse[i].description.substring(0, 100)}...</p></td>
             <td><p>${dataBase.produse[i].price} <i class="fas fa-dollar-sign"></i></p></td>
@@ -141,7 +141,7 @@ function drawProductDetails(){
         str = `<div class="container">
         <div class="row">
             <div class="col-lg-6 col-xl-7 pt-4 order-2 order-lg-1 photoswipe-gallery">
-                <img src="/ai-mag/${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
+                <img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
             </div>
             <div class="col-lg-6 col-xl-4 pt-4 order-1 order-lg-2 ml-lg-auto">
                 <h2><strong>${dataBase.produse[i].name}</strong></h2><hr>
@@ -152,7 +152,7 @@ function drawProductDetails(){
                     <li>Price: <i class="fas fa-dollar-sign"></i> ${dataBase.produse[i].price}</li>
                     <li>Stock: ${dataBase.produse[i].stoc} items.</li>
                 </ul>
-                <form onsubmit="addToCart(${i}, event)">
+                <form onsubmit="addToCart('${i}', event)">
                     <input name="count" type="number" value="1" class="btn detail-quantity" min="1" max="${dataBase.produse[i].stoc}">
                     <input type="submit" value="Add to Cart" class="btn btn-secondary">
                 </form>
@@ -172,7 +172,7 @@ function drawProductList(){
         str += `<div class="col-xl-2 col-lg-3 col-md-4 col-6">
         <div class="product">
             <div class="product-image">
-                <img src="/ai-mag/${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
+                <img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
             </div>
             <div class="info-box">
                 <h3 class="text-base mb-1"><a href="product-page.html?id=${i}" class="text-dark">${dataBase.produse[i].name}</a></h3>
@@ -201,7 +201,7 @@ function drawCart(){
             <th scope="row">${item}</th>
             <th><a href="${productPage}?id=${item}">${dataBase.cart[i].name}</a></th>
             <td>${dataBase.cart[i].price}$</td>
-            <td><input type="number" value="${dataBase.cart[i].count}" name="produsIndex" min="0" max="${dataBase.produse[item].stoc}" onchange="more(this, '${i}')" class="input text-centred"></td>
+            <td><input type="number" value="${dataBase.cart[i].count}" name="produsIndex" min="0" max="${dataBase.produse[item].stoc}" onkeydown="return false" onchange="more(this, '${i}')" class="input text-centred"></td>
             <td>${subtotal}$</td>
             <td><a href="#" onclick="remove('${i}')" class="btn btn-link">Replace</a></td>
         </tr>`;
@@ -315,7 +315,7 @@ function hideNull(){
  */
 
 async function display(){
-    console.log(document.location.pathname);
+    console.log(window.location);
     var response = await fetch("https://magog-products.firebaseio.com/.json");
     window.dataBase = await response.json();
     var main = "";
@@ -341,7 +341,7 @@ async function display(){
 /**
  * Randeaza pagina de HOME
  */
-    if(document.location.pathname === homePage || document.location.pathname === "/ai-mag/"){
+    if(document.location.pathname === homePage || document.location.pathname === "/"){
         document.querySelector("header").insertAdjacentHTML("afterend", `<hr>${bootstrapSlideShow}<hr>`);
         drawProductList();
 /**
@@ -408,8 +408,8 @@ async function display(){
                             <thead>
                                 <tr>
                                     <th scope="col" class="w-25 col-sm-2">Image</th>
-                                    <th scope="col">Item Name</th>
-                                    <th scope="col" class="w-25">Description</th>
+                                    <th scope="col" class="w-25 col-sm-2">Item Name</th>
+                                    <th scope="col" class="w-25 col-sm-2">Description</th>
                                     <th scope="col">Price <i class="fas fa-dollar-sign"></i></th>
                                     <th scope="col">Stock</th>
                                     <th scope="col" class="text-center"><a class="btn btn-primary" href="javascript:addNewProductForm()" title="Add New Item"><i class="fas fa-plus"></i></a></th>
@@ -471,13 +471,13 @@ var bootstrapSlideShow = `<div id="demo" class="carousel slide" data-ride="carou
   <!-- The slideshow -->
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="/ai-mag/img/slide01.jpg" alt="Los Angeles" width="1100" height="500">
+      <img src="/img/slide01.jpg" alt="Los Angeles" width="1100" height="500">
     </div>
     <div class="carousel-item">
-      <img src="/ai-mag/img/slide02.jpg" alt="Chicago" width="1100" height="500">
+      <img src="/img/slide02.jpg" alt="Chicago" width="1100" height="500">
     </div>
     <div class="carousel-item">
-      <img src="/ai-mag/img/slide03.jpg" alt="New York" width="1100" height="500">
+      <img src="/img/slide03.jpg" alt="New York" width="1100" height="500">
     </div>
   </div>
   
