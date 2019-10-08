@@ -1,9 +1,8 @@
-var indexProdus = -1;
 var dataBase = [];
-var homePage = "/index.html";
-var productPage = "/product-page.html";
-var cartPage = "/cart.html";
-var adminPage = "/admin.html";
+var homePage = "/ai-mag/index.html";
+var productPage = "/ai-mag/product-page.html";
+var cartPage = "/ai-mag/cart.html";
+var adminPage = "/ai-mag/admin.html";
 var size = 0;
 var header = `<hgroup>
     <h1 class="text-success"><a href="index.html" class="card-link"><i class="fas fa-eye"></i> <strong>AI-Mag</strong></a> - <small>My First Online Virtual Shop</small></h1>
@@ -341,7 +340,7 @@ async function display(){
 /**
  * Randeaza pagina de HOME
  */
-    if(document.location.pathname === homePage || document.location.pathname === "/"){
+    if(document.location.pathname === homePage || document.location.pathname === "/ai-mag/"){
         document.querySelector("header").insertAdjacentHTML("afterend", `<hr>${bootstrapSlideShow}<hr>`);
         drawProductList();
 /**
