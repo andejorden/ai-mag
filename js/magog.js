@@ -345,7 +345,7 @@ async function display(){
 /**
  * Randeaza pagina de HOME
  */
-    if(document.location.pathname === homePage || document.location.pathname === "/"){
+    if(document.location.pathname === homePage || document.location.pathname === "/ai-mag"){
         document.querySelector("header").insertAdjacentHTML("afterend", `<hr>${bootstrapSlideShow}<hr>`);
         drawProductList();
 /**
