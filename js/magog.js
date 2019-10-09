@@ -140,38 +140,25 @@ function drawAdminPage(){
 
 function drawProductDetails(){
     var str = "";
-        var i = window.location.search.substring(4);
-        for(var item in dataBase.cart){
-            var rest = dataBase.produse[i].stoc - dataBase.cart[item].count;
-        }
-        str = `<div class="col-lg-6 col-xl-7 pt-4 order-2 order-lg-1">
-            <img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
-        </div>
-        <div class="col-lg-6 col-xl-4 pt-4 order-1 order-lg-2 ml-lg-auto">
-            <h2><strong>${dataBase.produse[i].name}</strong></h2><hr>
-            <h3 class="text-base mb-1">About the product</h3>
-            <p>${dataBase.produse[i].description}</p>
-            <hr>
-            <ul class="list-unstyled">
-                <li><strong>Price:</strong> <i class="fas fa-dollar-sign"></i> ${dataBase.produse[i].price}</li>
-                <li><strong>Stock:</strong> ${dataBase.produse[i].stoc} items.</li>
-            </ul>
-            <form onsubmit="addToCart('${i}', event)">
-                <input name="count" type="number" value="1" class="btn detail-quantity" min="1" max="">
-                <input type="submit" value="Add to Cart" class="btn btn-secondary">
-            </form>
-        </div>`;
+    var i = window.location.search.substring(4);
+    str = `<div class="col-lg-6 col-xl-7 pt-4 order-2 order-lg-1">
+        <img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
+    </div>
+    <div class="col-lg-6 col-xl-4 pt-4 order-1 order-lg-2 ml-lg-auto">
+        <h2><strong>${dataBase.produse[i].name}</strong></h2><hr>
+        <h3 class="text-base mb-1">About the product</h3>
+        <p>${dataBase.produse[i].description}</p>
+        <hr>
+        <ul class="list-unstyled">
+            <li><strong>Price:</strong> <i class="fas fa-dollar-sign"></i> ${dataBase.produse[i].price}</li>
+            <li><strong>Stock:</strong> ${dataBase.produse[i].stoc} items.</li>
+        </ul>
+        <form onsubmit="addToCart('${i}', event)">
+            <input name="count" type="number" value="1" class="btn detail-quantity" min="1" max="${dataBase.produse[i].stoc}">
+            <input type="submit" value="Add to Cart" class="btn btn-secondary">
+        </form>
+    </div>`;
     document.querySelector("div.row").innerHTML = str;
-    if(rest === undefined){
-        document.querySelector("[name='count']").setAttribute("max", dataBase.produse[i].stoc);
-    }else{
-        document.querySelector("[name='count']").setAttribute("max", rest);
-    }
-    if(rest === 0){
-        document.querySelector("div.alert").classList.add("alert-danger");
-        document.querySelector("div.alert").classList.remove("d-none");
-        document.querySelector("div.alert").innerHTML = `Ai in cos toate produsele <strong>${dataBase.produse[i].name}</strong> din stoc (${dataBase.cart[item].count})!`;
-    }
 }
 
 /**
@@ -197,40 +184,60 @@ function drawProductList(){
 }
 
 /**
- * incarca Cosul de Cumparaturi
+ * DRAW Cosul de Cumparaturi
  */
     
 function drawCart(){
     var total = 0;
     var subtotal = 0;
     var str = "";
-    var info = "";
+    var tableData = "";
+    console.log(dataBase.cart);
+    
     for(var i in dataBase.cart){
         var item = dataBase.cart[i].id;
-        console.log(dataBase.cart);
         subtotal = (dataBase.cart[i].price * dataBase.cart[i].count).toFixed(2);
         total += Number(subtotal);
-        str += `<tr>
+        tableData += `<tr>
             <th scope="row">${item}</th>
             <th><a href="${productPage}?id=${item}">${dataBase.cart[i].name}</a></th>
             <td>${dataBase.cart[i].price}$</td>
-            <td><input type="number" value="${dataBase.cart[i].count}" name="produsIndex" min="0" max="${dataBase.produse[item].stoc}" onkeydown="return false" onchange="more(this, '${i}')" class="input text-centred"></td>
+            <td><input type="number" value="${dataBase.cart[i].count}" min="0" max="${dataBase.produse[item].stoc}" onkeydown="return false" onchange="more(this, '${i}')" class="form-control btn btn-light" required></td>
             <td>${subtotal}$</td>
             <td><a href="#" onclick="remove('${i}')" class="btn btn-link">Replace</a></td>
         </tr>`;
-    };
-    info = `<hr>
-    <ul class="list-unstyled">
-        <li><strong>Numar produse:</strong> ${size}</li>
-        <li><strong>TVA:</strong> ${valoareTVA(total).toFixed(2)}$</li>
-        <li><strong>Transport:</strong> 0$</li>
-    </ul>
-    <hr>
-    <h3 class="text-important"><strong>Total:</strong> <small class="text-success">${(total + valoareTVA(total)).toFixed(2)}$</small></h3>
-    <hr>
-    <button type="button" class="btn btn-primary" onClick="orderList()">Trimite comanda</button>`;
-    document.querySelector("tbody").innerHTML = str;
-    document.querySelector("article").insertAdjacentHTML("beforeend", `${info}`);
+    }
+        
+    str=`<h2><strong>Shopping Cart</strong></h2>
+    <form onsubmit="orderList(event)" class="needs-validation">
+        <div id="cartTable" class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">id#</th>
+                        <th scope="col">Nume Produs</th>
+                        <th scope="col">Pret</th>
+                        <th scope="col">Cantitate</th>
+                        <th scope="col" colspan="2">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                ${tableData}
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <ul class="list-unstyled">
+            <li><strong>Numar produse:</strong>  ${size}</li>
+            <li><strong>TVA:</strong> ${valoareTVA(total).toFixed(2)}$</li>
+            <li><strong>Transport:</strong> 0$</li>
+        </ul>
+        <hr>
+        <h3 class="text-important"><strong>Total:</strong> <small class="text-success">${(total + valoareTVA(total)).toFixed(2)}$</small></h3>
+        <hr>
+        <button type="submit" class="btn btn-primary">Trimite comanda</button>
+    </form>`;
+    document.querySelector("article").innerHTML = str;
 }
 
 /**
@@ -238,6 +245,7 @@ function drawCart(){
  */
 
 async function orderList(){
+    event.preventDefault();
     for(var i in dataBase.cart){
         var j = dataBase.cart[i].id;
         var restStoc = dataBase.produse[j].stoc - dataBase.cart[i].count;
@@ -267,6 +275,7 @@ function valoareTVA(pere){
  */
 
 async function more(el, produs){
+    console.log(el.classList);
     var elNumeric = Number(el.value);
     if(elNumeric === 0){
         response = await fetch(`https://magog-products.firebaseio.com/cart/${produs}/.json`,{method:"delete"});
@@ -344,7 +353,7 @@ async function display(){
 /**
  * Randeaza Lista Produse in Home
  */
-    if(document.location.pathname === homePage || document.location.pathname === "/ai-mag/"){
+    if(document.location.pathname === homePage || document.location.pathname === "/" || document.location.pathname === "/ai-mag/"){
         document.querySelector("header").insertAdjacentHTML("afterend",`${bootstrapSlideShow}`);
         drawProductList();
 /**
@@ -357,23 +366,6 @@ async function display(){
  * Randeaza pagina COS (CART PAGE)
  */
     }else if(window.location.pathname === cartPage){
-        str = `<h2><strong>Shopping Cart</strong></h2>
-        <div id="cartTable" class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">id#</th>
-                        <th scope="col">Nume Produs</th>
-                        <th scope="col">Pret</th>
-                        <th scope="col">Cantitate</th>
-                        <th scope="col" colspan="2">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>`;
-        document.querySelector("article").innerHTML = str;
         cartItemsNumber();
         drawCart();
         hideNull();
