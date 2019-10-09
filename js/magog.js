@@ -344,7 +344,7 @@ async function display(){
 /**
  * Randeaza Lista Produse in Home
  */
-    if(document.location.pathname === homePage || document.location.pathname === "/" || document.location.pathname === "/ai-mag/"){
+    if(document.location.pathname === homePage || document.location.pathname === "/ai-mag/"){
         document.querySelector("header").insertAdjacentHTML("afterend",`${bootstrapSlideShow}`);
         drawProductList();
 /**
