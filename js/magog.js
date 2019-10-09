@@ -2,8 +2,9 @@ var dataBase = [];
 var size = 0;
 
 class Produs{
-    constructor(id, name, price, count){
+    constructor(id, cartStoc, name, price, count){
         this.id = id,
+        this.cartStoc = cartStoc,
         this.name = name,
         this.price = price,
         this.count = count;
@@ -17,6 +18,7 @@ class Produs{
 async function removeProductsItem(i){
     if(confirm(`Sigur vrei sa stergi din lista produsul ${dataBase.produse[i].name}`)){
         response = await fetch(`https://magog-products.firebaseio.com/produse/${i}.json`, {method:"delete"});
+        document.querySelector("div.alert").classList.add("alert-success");
         document.querySelector("div.alert").classList.remove("d-none");
         document.querySelector("div.alert").innerHTML = `<strong>${dataBase.produse[i].name}</strong> a fost sters din lista!`;
         setTimeout(function(){ display(); }, 2000);
@@ -51,6 +53,7 @@ async function removeProductsItem(i){
         return;
     }else{
     response = await fetch(`https://magog-products.firebaseio.com/produse/.json`, {method:"post", body:JSON.stringify(obj)});
+    document.querySelector("div.alert").classList.add("alert-success");
     document.querySelector("div.alert").classList.remove("d-none");
     document.querySelector("div.alert").innerHTML = `<strong>SUCCES</strong> produsul a fost adaugat in lista!`;
     form.reset();
@@ -64,7 +67,7 @@ async function removeProductsItem(i){
 
  function addNewProductForm(){
     document.querySelector("#adminForm").setAttribute("onSubmit", "saveNewProduct(this, event)");
-    document.querySelector("article").classList.add("d-none");
+    document.querySelector("#adminTable").classList.add("d-none");
     document.querySelector("section").classList.remove("d-none");
   }
 
@@ -90,6 +93,7 @@ async function removeProductsItem(i){
          return;
      }else{
         response = await fetch(`https://magog-products.firebaseio.com/produse/${i}.json`, {method:"put", body:JSON.stringify(obj)});
+        document.querySelector("div.alert").classList.add("alert-success");
         document.querySelector("div.alert").classList.remove("d-none");
         document.querySelector("div.alert").innerHTML = `<strong>Produsul</strong> a fost modificat cu succes!`;
         form.reset();
@@ -102,7 +106,7 @@ async function removeProductsItem(i){
  */
 
  function editItem(i){
-     document.querySelector("article").classList.add("d-none");
+     document.querySelector("#adminTable").classList.add("d-none");
      document.querySelector("section").classList.remove("d-none");
      document.querySelector("[name='Imagine']").value = dataBase.produse[i].image;
      document.querySelector("[name='Nume']").value = dataBase.produse[i].name;
@@ -119,7 +123,7 @@ function drawAdminPage(){
     var str = "";
     for( var i in dataBase.produse){
         str += `<tr>
-            <td><img src="/ai-mag/${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail"></td>
+            <td><img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail"></td>
             <td><h3><a href="#${i}" onclick="editItem('${i}', event)" title="Edit this Item">${dataBase.produse[i].name}</a></h3></td>
             <td><p>${dataBase.produse[i].description.substring(0, 100)}...</p></td>
             <td><p>${dataBase.produse[i].price} <i class="fas fa-dollar-sign"></i></p></td>
@@ -131,38 +135,47 @@ function drawAdminPage(){
 }
 
 /**
- * incarca pagina DETALII
+ * draw Pagina DETALII
  */
 
 function drawProductDetails(){
     var str = "";
         var i = window.location.search.substring(4);
-        str = `<div class="container">
-        <div class="row">
-            <div class="col-lg-6 col-xl-7 pt-4 order-2 order-lg-1 photoswipe-gallery">
-                <img src="/ai-mag/${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
-            </div>
-            <div class="col-lg-6 col-xl-4 pt-4 order-1 order-lg-2 ml-lg-auto">
-                <h2><strong>${dataBase.produse[i].name}</strong></h2><hr>
-                <h3 class="text-base mb-1">About the product</h3>
-                <p>${dataBase.produse[i].description}</p>
-                <hr>
-                <ul class="list-unstyled">
-                    <li>Price: <i class="fas fa-dollar-sign"></i> ${dataBase.produse[i].price}</li>
-                    <li>Stock: ${dataBase.produse[i].stoc} items.</li>
-                </ul>
-                <form onsubmit="addToCart('${i}', event)">
-                    <input name="count" type="number" value="1" class="btn detail-quantity" min="1" max="${dataBase.produse[i].stoc}">
-                    <input type="submit" value="Add to Cart" class="btn btn-secondary">
-                </form>
-            </div>
+        for(var item in dataBase.cart){
+            var rest = dataBase.produse[i].stoc - dataBase.cart[item].count;
+        }
+        str = `<div class="col-lg-6 col-xl-7 pt-4 order-2 order-lg-1">
+            <img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
         </div>
+        <div class="col-lg-6 col-xl-4 pt-4 order-1 order-lg-2 ml-lg-auto">
+            <h2><strong>${dataBase.produse[i].name}</strong></h2><hr>
+            <h3 class="text-base mb-1">About the product</h3>
+            <p>${dataBase.produse[i].description}</p>
+            <hr>
+            <ul class="list-unstyled">
+                <li><strong>Price:</strong> <i class="fas fa-dollar-sign"></i> ${dataBase.produse[i].price}</li>
+                <li><strong>Stock:</strong> ${dataBase.produse[i].stoc} items.</li>
+            </ul>
+            <form onsubmit="addToCart('${i}', event)">
+                <input name="count" type="number" value="1" class="btn detail-quantity" min="1" max="">
+                <input type="submit" value="Add to Cart" class="btn btn-secondary">
+            </form>
         </div>`;
-    document.querySelector("article").innerHTML = str;
+    document.querySelector("div.row").innerHTML = str;
+    if(rest === undefined){
+        document.querySelector("[name='count']").setAttribute("max", dataBase.produse[i].stoc);
+    }else{
+        document.querySelector("[name='count']").setAttribute("max", rest);
+    }
+    if(rest === 0){
+        document.querySelector("div.alert").classList.add("alert-danger");
+        document.querySelector("div.alert").classList.remove("d-none");
+        document.querySelector("div.alert").innerHTML = `Ai in cos toate produsele <strong>${dataBase.produse[i].name}</strong> din stoc (${dataBase.cart[item].count})!`;
+    }
 }
 
 /**
- * incarca produsele in Main pe Prima Pagina 
+ * draw Lista de Produse
  */
 
 function drawProductList(){
@@ -171,7 +184,7 @@ function drawProductList(){
         str += `<div class="col-xl-2 col-lg-3 col-md-4 col-6">
         <div class="product">
             <div class="product-image">
-                <img src="/ai-mag/${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
+                <img src="${dataBase.produse[i].image}" alt="${dataBase.produse[i].name}" class="img-thumbnail">
             </div>
             <div class="info-box">
                 <h3 class="text-base mb-1"><a href="product-page.html?id=${i}" class="text-dark">${dataBase.produse[i].name}</a></h3>
@@ -213,7 +226,7 @@ function drawCart(){
         <li><strong>Transport:</strong> 0$</li>
     </ul>
     <hr>
-    <h2 class="text-important"><strong>Total:</strong> <small class="text-success">${(total + valoareTVA(total)).toFixed(2)}$</small></h2>
+    <h3 class="text-important"><strong>Total:</strong> <small class="text-success">${(total + valoareTVA(total)).toFixed(2)}$</small></h3>
     <hr>
     <button type="button" class="btn btn-primary" onClick="orderList()">Trimite comanda</button>`;
     document.querySelector("tbody").innerHTML = str;
@@ -234,6 +247,7 @@ async function orderList(){
         }else{
             response = await fetch(`https://magog-products.firebaseio.com/produse/${j}/stoc/.json`,{method:"put", body:JSON.stringify(restStoc)});
             response = await fetch(`https://magog-products.firebaseio.com/cart/${i}/.json`,{method:"delete"});
+            document.querySelector("div.alert").classList.add("alert-success");
             document.querySelector("div.alert").classList.remove("d-none");
             document.querySelector("div.alert").innerHTML = `<strong>Comanda</strong> a fost trimisa cu succes!`;
             setTimeout(function(){ display(); }, 2000);
@@ -281,12 +295,13 @@ async function addToCart(i, event){
 
     var quantity = document.querySelector("[name='count']").value;
     var quantityNumeric = Number(quantity);
-    var produs = new Produs(i, dataBase.produse[i].name, dataBase.produse[i].price, quantityNumeric);
+    var produs = new Produs(i, dataBase.produse[i].stoc, dataBase.produse[i].name, dataBase.produse[i].price, quantityNumeric);
 
     for(var item in dataBase.cart){
         if(dataBase.cart[item].id === i){
             quantityNumeric += dataBase.cart[item].count;
             response = await fetch(`https://magog-products.firebaseio.com/cart/${item}/count/.json`,{method:"put", body:JSON.stringify(quantityNumeric)});
+            document.querySelector("div.alert").classList.add("alert-success");
             document.querySelector("div.alert").classList.remove("d-none");
             document.querySelector("div.alert").innerHTML = `<strong>${dataBase.produse[i].name}</strong> a fost adaugat in cos!`;
             setTimeout(function(){ display(); }, 2000);
@@ -295,6 +310,7 @@ async function addToCart(i, event){
     }
 
     response = await fetch("https://magog-products.firebaseio.com/cart/.json",{method:"post", body:JSON.stringify(produs)});
+    document.querySelector("div.alert").classList.add("alert-success");
     document.querySelector("div.alert").classList.remove("d-none");
     document.querySelector("div.alert").innerHTML = `<strong>${dataBase.produse[i].name}</strong> a fost adaugat in cos!`;
     setTimeout(function(){ display(); }, 2000);
@@ -322,72 +338,42 @@ async function display(){
     console.log("draw...");
     var response = await fetch("https://magog-products.firebaseio.com/.json");
     window.dataBase = await response.json();
-    var main = "";
-    main = `<div class="alert alert-success w-100 position-fixed fixed-top rounded-0 text-center d-none"><strong>Success!</strong> Indicates a successful or positive action.</div>
-    <div class="container">
-        <header class="mt-3 mb-3">
-            ${header}
-            <nav>
-                <button type="button" class="btn btn-primary" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-cart"></i> Shopping Cart</button>
-                <button type="button" class="btn btn-light"onclick="window.location.href='admin.html'"><i class="fas fa-lock"></i> Admin</button>
-            </nav>
-        </header>
-        <article>
-            <h2><strong>The Product List</strong></h2>
-            <hr>
-            <div class="row">
-            </div>
-            <hr>
-        </article>
-        ${footer}
-    </div>`;
-    document.querySelector("main").innerHTML = main;
+    var str = "";
+    str = `${main}`;
+    document.querySelector("main").innerHTML = str;
 /**
- * Randeaza pagina de HOME
+ * Randeaza Lista Produse in Home
  */
-    if(document.location.pathname === homePage || document.location.pathname === "/ai-mag/"){
-        document.querySelector("header").insertAdjacentHTML("afterend", `<hr>${bootstrapSlideShow}<hr>`);
+    if(document.location.pathname === homePage || document.location.pathname === "/" || document.location.pathname === "/ai-mag/"){
+        document.querySelector("header").insertAdjacentHTML("afterend",`${bootstrapSlideShow}`);
         drawProductList();
 /**
  * Randeaza pagina DETALII
  */
     }else if(window.location.href.indexOf(productPage) > -1){
-    drawProductDetails();
+        document.querySelector("article h2 > strong").innerHTML = "The Product Page";
+        drawProductDetails();
 /**
  * Randeaza pagina COS (CART PAGE)
  */
     }else if(window.location.pathname === cartPage){
-        main = `<div class="alert alert-success w-100 position-fixed fixed-top rounded-0 text-center d-none"><strong>Success!</strong> Indicates a successful or positive action.</div>
-        <div class="container">
-            <header class="mt-3 mb-3">
-                ${header}
-                <nav>
-                    <button type="button" class="btn btn-primary disabled"><i class="fas fa-shopping-cart"></i> Shopping Cart</button>
-                    <button type="button" class="btn btn-light"onclick="window.location.href='admin.html'"><i class="fas fa-lock"></i> Admin</button>
-                </nav>
-            </header>
-            <article class="container">
-                <hr>
-                <h2><strong>Shopping Cart</strong></h2>
-                <div id="cartTable" class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">id#</th>
-                                <th scope="col">Nume Produs</th>
-                                <th scope="col">Pret</th>
-                                <th scope="col">Cantitate</th>
-                                <th scope="col" colspan="2">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </article>
-            ${footer}
+        str = `<h2><strong>Shopping Cart</strong></h2>
+        <div id="cartTable" class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">id#</th>
+                        <th scope="col">Nume Produs</th>
+                        <th scope="col">Pret</th>
+                        <th scope="col">Cantitate</th>
+                        <th scope="col" colspan="2">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>`;
-        document.querySelector("main").innerHTML = main;
+        document.querySelector("article").innerHTML = str;
         cartItemsNumber();
         drawCart();
         hideNull();
@@ -397,70 +383,55 @@ async function display(){
  */
 
     }else if(window.location.pathname === adminPage){
-        main = `<div class="alert alert-success w-100 position-fixed fixed-top rounded-0 text-center d-none"><strong>Success!</strong> Indicates a successful or positive action.</div>
-        <div class="container">
-            <header class="mt-3 mb-3">
-                ${header}
-                <nav>
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-cart"></i> Shopping Cart</button>
-                    <button type="button" class="btn btn-light disabled"><i class="fas fa-lock"></i> Admin</button>
-                </nav>
-            </header>
-            <article>
-                <hr>
-                <h2><strong>Admin Page</strong><small class="text-success"> - Edit, Add/Remove</small></h2>
-                    <div id="cartTable" class="table-responsive-sm">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="w-25 col-sm-2">Image</th>
-                                    <th scope="col" class="w-25 col-sm-2">Item Name</th>
-                                    <th scope="col" class="w-25 col-sm-2">Description</th>
-                                    <th scope="col">Price <i class="fas fa-dollar-sign"></i></th>
-                                    <th scope="col">Stock</th>
-                                    <th scope="col" class="text-center"><a class="btn btn-primary" href="javascript:addNewProductForm()" title="Add New Item"><i class="fas fa-plus"></i></a></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                <hr>
-            </article>
-            <section class="container w-50 p-3 d-none">
-                <h2><strong>Add New Products in The Store</strong></h2>
-                <hr>
-                <form id="adminForm" onsubmit="adminEditSubmit(this, event)">
-                    <div class="form-group">
-                        <label for="FormControlInput1"><strong>Name:</strong></label>
-                        <input type="text" class="form-control" id="FormControlInput1" name="Nume" placeholder="Name">
-                    </div>
-                    <div class="form-group">
-                        <label for="FormControlInput2"><strong>Image:</strong></label>
-                        <input type="text" class="form-control" id="FormControlInput2" name="Imagine" placeholder="Image">
-                    </div>
-                    <div class="form-group">
-                        <label for="FormControlTextarea1"><strong>Details:</strong></label>
-                        <textarea class="form-control" id="FormControlTextarea1" name="Datalii" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="FormControlInput3"><strong>Price:</strong></label>
-                        <input type="number" class="form-control" id="FormControlInput3" name="Pret" placeholder="Price" step=".01">
-                    </div>
-                    <div class="form-group">
-                        <label for="FormControlInput4"><strong>Stoc:</strong></label>
-                        <input type="number" class="form-control" id="FormControlInput4" name="Stoc" placeholder="Stock">
-                    </div>
-                    <div class="form-group">
-                    <input type="submit" value="Save!" class="btn btn-primary">
-                    <input type="reset" value="Cancel" class="btn btn-secondary" onclick="adminFormReset()">
-                    </div>
-                </form>
-                <hr>
-            </section>
-            ${footer}
-        </div>`;
-        document.querySelector("main").innerHTML = main;
+        str = `<h2><strong>Admin Page</strong><small class="text-success"> - Edit, Add/Remove</small></h2>
+        <hr>
+        <div id="adminTable" class="table-responsive-sm">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col" class="w-25 col-sm-2">Image</th>
+                        <th scope="col" class="w-25 col-sm-2">Item Name</th>
+                        <th scope="col" class="w-25 col-sm-2">Description</th>
+                        <th scope="col">Price <i class="fas fa-dollar-sign"></i></th>
+                        <th scope="col">Stock</th>
+                        <th scope="col" class="text-center"><a class="btn btn-primary" href="javascript:addNewProductForm()" title="Add New Item"><i class="fas fa-plus"></i></a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <section class="container w-50 p-3 d-none">
+            <h2><strong>Add/Edit New Products in The Store</strong></h2>
+            <hr>
+            <form id="adminForm" onsubmit="adminEditSubmit(this, event)">
+                <div class="form-group">
+                    <label for="FormControlInput1"><strong>Name:</strong></label>
+                    <input type="text" class="form-control" id="FormControlInput1" name="Nume" placeholder="Name">
+                </div>
+                <div class="form-group">
+                    <label for="FormControlInput2"><strong>Image:</strong></label>
+                    <input type="text" class="form-control" id="FormControlInput2" name="Imagine" placeholder="Image">
+                </div>
+                <div class="form-group">
+                    <label for="FormControlTextarea1"><strong>Details:</strong></label>
+                    <textarea class="form-control" id="FormControlTextarea1" name="Datalii" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="FormControlInput3"><strong>Price:</strong></label>
+                    <input type="number" class="form-control" id="FormControlInput3" name="Pret" placeholder="Price" step=".01">
+                </div>
+                <div class="form-group">
+                    <label for="FormControlInput4"><strong>Stoc:</strong></label>
+                    <input type="number" class="form-control" id="FormControlInput4" name="Stoc" placeholder="Stock">
+                </div>
+                <div class="form-group">
+                <input type="submit" value="Save!" class="btn btn-primary">
+                <input type="reset" value="Cancel" class="btn btn-secondary" onclick="adminFormReset()">
+                </div>
+            </form>
+        </section>`;
+        document.querySelector("article").innerHTML = str;
         drawAdminPage();
     }
 }
