@@ -202,7 +202,7 @@ function drawCart(){
             <th scope="row">${item}</th>
             <th><a href="${productPage}?id=${item}">${dataBase.cart[i].name}</a></th>
             <td>${dataBase.cart[i].price}$</td>
-            <td><input type="number" value="${dataBase.cart[i].count}" min="0" max="${dataBase.produse[item].stoc}" onkeydown="return false" onchange="more(this, '${i}')" class="form-control btn btn-light" required></td>
+            <td><input type="number" value="${dataBase.cart[i].count}" min="0" max="${dataBase.produse[item].stoc}" onchange="more(this, '${i}')" class="form-control btn btn-light" required></td>
             <td>${subtotal}$</td>
             <td><a href="#" onclick="remove('${i}')" class="btn btn-link">Replace</a></td>
         </tr>`;
