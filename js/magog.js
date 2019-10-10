@@ -221,7 +221,7 @@ function drawCart(){
     }
         
     str=`<h2><strong>Shopping Cart</strong></h2>
-    <form onsubmit="orderList(event)" class="needs-validation">
+    <form onsubmit="orderList(event)">
         <div id="cartTable" class="table-responsive">
             <table class="table table-hover">
                 <thead>
