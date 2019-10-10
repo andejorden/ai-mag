@@ -12,6 +12,18 @@ class Produs{
 }
 
 /**
+ * verifica daca formularele sunt valide
+ */
+
+function formValidation(){
+    let theForm = document.querySelector("form");
+    if(theForm.checkValidity() === false){
+        console.log("NOT VALID!!!");
+        theForm.classList.add('was-validated');
+    }
+}
+
+/**
  * functia Remove Item
  */
 
@@ -369,6 +381,7 @@ async function display(){
         cartItemsNumber();
         drawCart();
         hideNull();
+        formValidation();
 
 /**
  * Randeaza pagina de ADMIN
