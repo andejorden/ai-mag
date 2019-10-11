@@ -311,30 +311,37 @@ async function remove(item){
 
 async function addToCart(i, event){
     event.preventDefault();
-    var response = await fetch("https://magog-products.firebaseio.com/cart/.json");
+    let response = await fetch("https://magog-products.firebaseio.com/cart/.json");
     window.dataBase.cart = await response.json();
 
-    var quantity = document.querySelector("[name='count']").value;
-    var quantityNumeric = Number(quantity);
-    var produs = new Produs(i, dataBase.produse[i].stoc, dataBase.produse[i].name, dataBase.produse[i].price, quantityNumeric);
-
-    for(var item in dataBase.cart){
-        if(dataBase.cart[item].id === i){
-            quantityNumeric += dataBase.cart[item].count;
-            response = await fetch(`https://magog-products.firebaseio.com/cart/${item}/count/.json`,{method:"put", body:JSON.stringify(quantityNumeric)});
-            document.querySelector("div.alert").classList.add("alert-success");
-            document.querySelector("div.alert").classList.remove("d-none");
-            document.querySelector("div.alert").innerHTML = `<strong>${dataBase.produse[i].name}</strong> a fost adaugat in cos!`;
-            setTimeout(function(){ display(); }, 2000);
-            return;
+    let quantity = Number(document.querySelector("[name='count']").value);
+    let produs = new Produs(i, dataBase.produse[i].stoc, dataBase.produse[i].name, dataBase.produse[i].price, quantity);
+    if(dataBase.cart === null){
+        response = await fetch("https://magog-products.firebaseio.com/cart/.json",{method:"post", body:JSON.stringify(produs)});
+        document.querySelector("div.alert").classList.add("alert-success");
+        document.querySelector("div.alert").classList.remove("d-none");
+        document.querySelector("div.alert").innerHTML = `<strong>${dataBase.produse[i].name}</strong> a fost adaugat in cos!`;
+        setTimeout(function(){ display(); }, 2000);
+    }else{
+        for(let item in dataBase.cart){
+            if(dataBase.cart[item].id === i){
+                if(quantity + dataBase.cart[item].count <= dataBase.produse[i].stoc){
+                    quantity += dataBase.cart[item].count;
+                    console.log(quantity);
+                    response = await fetch(`https://magog-products.firebaseio.com/cart/${item}/count/.json`,{method:"put", body:JSON.stringify(quantity)});
+                    document.querySelector("div.alert").classList.add("alert-success");
+                    document.querySelector("div.alert").classList.remove("d-none");
+                    document.querySelector("div.alert").innerHTML = `<strong>${dataBase.produse[i].name}</strong> a fost adaugat in cos!`;
+                    setTimeout(function(){ display(); }, 2000);
+                }else{
+                    document.querySelector("div.alert").classList.add("alert-danger");
+                    document.querySelector("div.alert").classList.remove("d-none");
+                document.querySelector("div.alert").innerHTML = `Ai deja in cos ${dataBase.cart[item].count} produse <strong>${dataBase.produse[i].name}</strong> Mai poti adauga doar ${dataBase.produse[i].stoc - dataBase.cart[item].count} produse.`;
+                }
+                return;
+            }
         }
     }
-
-    response = await fetch("https://magog-products.firebaseio.com/cart/.json",{method:"post", body:JSON.stringify(produs)});
-    document.querySelector("div.alert").classList.add("alert-success");
-    document.querySelector("div.alert").classList.remove("d-none");
-    document.querySelector("div.alert").innerHTML = `<strong>${dataBase.produse[i].name}</strong> a fost adaugat in cos!`;
-    setTimeout(function(){ display(); }, 2000);
 }
 
 function cartItemsNumber(){
