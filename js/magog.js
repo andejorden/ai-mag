@@ -336,7 +336,8 @@ async function addToCart(i, event){
                 }else{
                     document.querySelector("div.alert").classList.add("alert-danger");
                     document.querySelector("div.alert").classList.remove("d-none");
-                document.querySelector("div.alert").innerHTML = `Ai deja in cos ${dataBase.cart[item].count} produse <strong>${dataBase.produse[i].name}</strong> Mai poti adauga doar ${dataBase.produse[i].stoc - dataBase.cart[item].count} produse.`;
+                    document.querySelector("div.alert").innerHTML = `Ai deja in cos ${dataBase.cart[item].count} produse <strong>${dataBase.produse[i].name}</strong>. Mai poti adauga doar ${dataBase.produse[i].stoc - dataBase.cart[item].count} produse.`;
+                    setTimeout(function(){ display(); }, 2000);
                 }
                 return;
             }
