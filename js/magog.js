@@ -317,7 +317,7 @@ async function addToCart(i, event){
     let quantity = Number(document.querySelector("[name='count']").value);
     let produs = new Produs(i, dataBase.produse[i].stoc, dataBase.produse[i].name, dataBase.produse[i].price, quantity);
     if(dataBase.cart === null){
-        if(quantity < dataBase.produse[i].stoc){
+        if(quantity <= dataBase.produse[i].stoc){
             response = await fetch("https://magog-products.firebaseio.com/cart/.json",{method:"post", body:JSON.stringify(produs)});
             document.querySelector("div.alert").classList.add("alert-success");
             document.querySelector("div.alert").classList.remove("d-none");
